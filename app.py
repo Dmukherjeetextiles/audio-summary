@@ -1,7 +1,7 @@
 import streamlit as st
 import tempfile
 import os
-from scipy.io.wavfile import write
+from pydub import AudioSegment
 import io
 from transformers import pipeline
 import torch
@@ -45,8 +45,10 @@ if uploaded_file is not None:
     
     # Transcription section
     if st.button("Generate Transcript"):
-        with tempfile.NamedTemporaryFile(delete=False) as tmp_file:
-            tmp_file.write(uploaded_file.getvalue())
+        with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp_file:
+            # Convert to WAV format using pydub
+            audio = AudioSegment.from_file(uploaded_file)
+            audio.export(tmp_file.name, format="wav")
             tmp_path = tmp_file.name
             
         result = audio_to_text(tmp_path)
